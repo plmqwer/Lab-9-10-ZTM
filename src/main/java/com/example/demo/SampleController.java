@@ -16,10 +16,10 @@ public class SampleController {
     @GetMapping("/users")
     public List<User> getUsers(){
         return List.of(
-          new User(1,"jan","nowak","email1@gmail.com"),
-          new User(2,"jan","kowalski","email2@gmail.com"),
-          new User(3,"jan","wisniewski","email3@gmail.com"),
-          new User(4,"jan","stefan","email4@gmail.com")
+          new User(1,"Beniamin","PRALAT","beniamin@gmail.com"),
+          new User(2,"Damian","SIUDOWSKI","damian@gmail.com"),
+          new User(3,"Lukasz","SZAJNA","lukasz@gmail.com"),
         );
     }
 }
+
