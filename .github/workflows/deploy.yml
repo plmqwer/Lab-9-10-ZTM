@@ -32,5 +32,5 @@ jobs:
         service: demo-app
         image: europe-central2-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/demo-app/demo-app-image:${{ github.sha }}
         region: europe-central2
-        service_account: github-deployer@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com
-        flags: '--port=8088 --allow-unauthenticated'
+        # Poprawiona linia - flaga zamiast inputu:
+        flags: '--port=8088 --allow-unauthenticated --service-account=github-deployer@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com'
