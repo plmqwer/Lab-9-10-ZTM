@@ -2,23 +2,17 @@ name: Deploy to Cloud Run
 
 on:
   push:
-    branches: [ "main" ]
-
-env:
-  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-  REGION: europe-central2
-  SERVICE_NAME: demo-app
+    branches:
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
     - name: Google Auth
-      id: auth
       uses: 'google-github-actions/auth@v2'
       with:
         credentials_json: '${{ secrets.GCP_SA_KEY }}'
@@ -26,18 +20,21 @@ jobs:
     - name: Set up Cloud SDK
       uses: 'google-github-actions/setup-gcloud@v2'
 
-    - name: Authorize Docker
-      run: gcloud auth configure-docker
-
     - name: Build and Push Container
       run: |
-        docker build -t gcr.io/$PROJECT_ID/$SERVICE_NAME:${{ github.sha }} .
-        docker push gcr.io/$PROJECT_ID/$SERVICE_NAME:${{ github.sha }}
+        # Konfiguracja Dockera pod konkretny region w Warszawie
+        gcloud auth configure-docker europe-central2-docker.pkg.dev --quiet
+        
+        # Budowanie obrazu z nowym adresem Artifact Registry
+        docker build -t europe-central2-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/demo-app/demo-app-image:${{ github.sha }} .
+        
+        # Wypchnięcie obrazu do Artifact Registry w Warszawie
+        docker push europe-central2-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/demo-app/demo-app-image:${{ github.sha }}
 
     - name: Deploy to Cloud Run
       uses: 'google-github-actions/deploy-cloudrun@v2'
       with:
-        service: ${{ env.SERVICE_NAME }}
-        image: gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
-        region: ${{ env.REGION }}
+        service: demo-app
+        image: europe-central2-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/demo-app/demo-app-image:${{ github.sha }}
+        region: europe-central2
         flags: '--port=8088 --allow-unauthenticated'
