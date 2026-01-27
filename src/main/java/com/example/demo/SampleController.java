@@ -2,9 +2,8 @@ package com.example.demo;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.List;
-import java.util.Map; // <--- Dodano ten import
+import java.util.Map;
 
 @RestController
 public class SampleController {
@@ -17,9 +16,9 @@ public class SampleController {
     @GetMapping("/users")
     public List<Map<String, Object>> getUsers(){
         return List.of(
-          Map.of("id", 1, "name", "Beniamin", "surname", "PRALAT", "email", "beniamin@gmail.com"),
-          Map.of("id", 2, "name", "Damian", "surname", "SIUDOWSKI", "email", "damian@gmail.com"),
-          Map.of("id", 3, "name", "Lukasz", "surname", "SZAJNA", "email", "lukasz@gmail.com")
+            Map.of("id", 1, "name", "Beniamin", "surname", "PRALAT", "email", "beniamin@gmail.com"),
+            Map.of("id", 2, "name", "Damian", "surname", "SIUDOWSKI", "email", "damian@gmail.com"),
+            Map.of("id", 3, "name", "Lukasz", "surname", "SZAJNA", "email", "lukasz@gmail.com")
         );
     }
 }
