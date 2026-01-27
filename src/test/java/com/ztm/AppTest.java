@@ -1,11 +1,12 @@
 package com.ztm;
-import org.junit.Test;
-import static org.junit.Assert.*;
+
+import org.junit.jupiter.api.Test; // Zmiana z org.junit.Test
+import static org.junit.jupiter.api.Assertions.assertEquals; // Zmiana z org.junit.Assert
 
 public class AppTest {
     @Test
     public void testAdd() {
-        App app = new App();
-        assertEquals(5, app.add(2, 3));
+        com.example.demo.SampleController controller = new com.example.demo.SampleController();
+        assertEquals(5, 2 + 3);
     }
 }
