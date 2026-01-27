@@ -4,22 +4,22 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map; // <--- Dodano ten import
 
 @RestController
 public class SampleController {
 
     @GetMapping("/test")
     public String testEndpoint() {
-    return "To jest testowy endpoint";
+        return "To jest testowy endpoint aplikacji: Beniamin PRALAT, Damian SIUDOWSKI, Lukasz SZAJNA";
     }
 
     @GetMapping("/users")
-    public List<User> getUsers(){
+    public List<Map<String, Object>> getUsers(){
         return List.of(
-          new User(1,"Beniamin","PRALAT","beniamin@gmail.com"),
-          new User(2,"Damian","SIUDOWSKI","damian@gmail.com"),
-          new User(3,"Lukasz","SZAJNA","lukasz@gmail.com"),
+          Map.of("id", 1, "name", "Beniamin", "surname", "PRALAT", "email", "beniamin@gmail.com"),
+          Map.of("id", 2, "name", "Damian", "surname", "SIUDOWSKI", "email", "damian@gmail.com"),
+          Map.of("id", 3, "name", "Lukasz", "surname", "SZAJNA", "email", "lukasz@gmail.com")
         );
     }
 }
-
