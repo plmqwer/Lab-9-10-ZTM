@@ -14,7 +14,7 @@ public class SampleController {
     }
 
     @GetMapping("/users")
-    public List<Map<String, Object>> getUsers(){
+    public List<Map<String, Object>> getUsers() {
         return List.of(
             Map.of("id", 1, "name", "Beniamin", "surname", "PRALAT", "email", "beniamin@gmail.com"),
             Map.of("id", 2, "name", "Damian", "surname", "SIUDOWSKI", "email", "damian@gmail.com"),
