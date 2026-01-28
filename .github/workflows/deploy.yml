@@ -22,20 +22,27 @@ jobs:
         service_account_key: ${{ secrets.GCP_SA_KEY }}
         export_default_credentials: true
 
-    # 3️⃣ Build Docker image
+    # 3️⃣ Authenticate Docker to Artifact Registry
+    - name: Authenticate Docker to Artifact Registry
+      run: |
+        echo "${{ secrets.GCP_SA_KEY }}" > "${HOME}/gcloud-key.json"
+        gcloud auth activate-service-account --key-file="${HOME}/gcloud-key.json"
+        gcloud auth configure-docker europe-central2-docker.pkg.dev
+
+    # 4️⃣ Build Docker image
     - name: Build Docker image
       run: |
         IMAGE_NAME=europe-central2-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/demo-app/demo-app-image
-        SHA=$(date +%s) # unikalny tag, żeby uniknąć konfliktu
+        SHA=$(date +%s) # unikalny tag dla każdego builda
         docker build -t $IMAGE_NAME:$SHA .
         echo "IMAGE=$IMAGE_NAME:$SHA" >> $GITHUB_ENV
 
-    # 4️⃣ Push Docker image to Artifact Registry
+    # 5️⃣ Push Docker image to Artifact Registry
     - name: Push Docker image
       run: |
         docker push $IMAGE
 
-    # 5️⃣ Deploy to Cloud Run
+    # 6️⃣ Deploy to Cloud Run
     - name: Deploy to Cloud Run
       run: |
         gcloud run deploy demo-app \
