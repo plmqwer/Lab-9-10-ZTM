@@ -21,14 +21,19 @@ jobs:
         project_id: ${{ secrets.GCP_PROJECT_ID }}
         export_default_credentials: true
 
-    # 3️⃣ Decode Service Account and authenticate Docker
+    # 3️⃣ Authenticate Docker to Artifact Registry
     - name: Authenticate Docker to Artifact Registry
       run: |
+        # Sprawdzenie, czy Secret istnieje
         if [ -z "${{ secrets.GCP_SA_KEY_BASE64 }}" ]; then
           echo "ERROR: GCP_SA_KEY_BASE64 jest pusty!"
           exit 1
         fi
-        echo "${{ secrets.GCP_SA_KEY_BASE64 }}" | base64 --decode > "${HOME}/gcloud-key.json"
+
+        # Dekodowanie base64 do JSON
+        printf '%s' "${{ secrets.GCP_SA_KEY_BASE64 }}" | base64 --decode > "${HOME}/gcloud-key.json"
+
+        # Aktywacja Service Account i Docker
         gcloud auth activate-service-account --key-file="${HOME}/gcloud-key.json"
         gcloud auth configure-docker europe-central2-docker.pkg.dev
 
