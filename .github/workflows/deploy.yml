@@ -5,20 +5,26 @@ on:
     branches:
       - main
 
+# 🔒 blokada równoległych deployów (WAŻNE)
+concurrency:
+  group: cloud-run-demo-app
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
     - name: Google Auth
-      uses: 'google-github-actions/auth@v2'
+      uses: google-github-actions/auth@v2
       with:
-        credentials_json: '${{ secrets.GCP_SA_KEY }}'
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
 
     - name: Set up Cloud SDK
-      uses: 'google-github-actions/setup-gcloud@v2'
+      uses: google-github-actions/setup-gcloud@v2
 
     - name: Build and Push Container
       run: |
@@ -27,10 +33,11 @@ jobs:
         docker push europe-central2-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/demo-app/demo-app-image:${{ github.sha }}
 
     - name: Deploy to Cloud Run
-      uses: 'google-github-actions/deploy-cloudrun@v2'
+      uses: google-github-actions/deploy-cloudrun@v2
       with:
         service: demo-app
         image: europe-central2-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/demo-app/demo-app-image:${{ github.sha }}
         region: europe-central2
-        # Poprawiona linia - flaga zamiast inputu:
-        flags: '--allow-unauthenticated --service-account=github-deployer@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com'
+        flags: >
+          --allow-unauthenticated
+          --service-account=github-deployer@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com
