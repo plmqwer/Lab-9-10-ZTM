@@ -19,13 +19,12 @@ jobs:
       uses: google-github-actions/setup-gcloud@v2
       with:
         project_id: ${{ secrets.GCP_PROJECT_ID }}
-        service_account_key: ${{ secrets.GCP_SA_KEY }}
         export_default_credentials: true
 
-    # 3️⃣ Authenticate Docker to Artifact Registry
+    # 3️⃣ Decode Service Account and authenticate Docker
     - name: Authenticate Docker to Artifact Registry
       run: |
-        echo "${{ secrets.GCP_SA_KEY }}" > "${HOME}/gcloud-key.json"
+        echo "${{ secrets.GCP_SA_KEY_BASE64 }}" | base64 --decode > "${HOME}/gcloud-key.json"
         gcloud auth activate-service-account --key-file="${HOME}/gcloud-key.json"
         gcloud auth configure-docker europe-central2-docker.pkg.dev
 
@@ -33,7 +32,7 @@ jobs:
     - name: Build Docker image
       run: |
         IMAGE_NAME=europe-central2-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/demo-app/demo-app-image
-        SHA=$(date +%s) # unikalny tag dla każdego builda
+        SHA=$(date +%s) # unikalny tag
         docker build -t $IMAGE_NAME:$SHA .
         echo "IMAGE=$IMAGE_NAME:$SHA" >> $GITHUB_ENV
 
