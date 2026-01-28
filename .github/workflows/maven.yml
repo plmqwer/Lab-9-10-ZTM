@@ -7,16 +7,53 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
+
     - name: Build with Maven
       run: mvn -B package --file pom.xml
+
+    # 🔐 Autoryzacja do GCP
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+    # ❗ KLUCZOWY KROK – bez tego masz DENIED
+    - name: Configure Docker for Artifact Registry
+      run: |
+        gcloud auth configure-docker europe-central2-docker.pkg.dev --quiet
+
+    # 🐳 Build + Push obrazu
+    - name: Build Docker image
+      run: |
+        docker build -t europe-central2-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/demo-app/demo-app .
+
+    - name: Push Docker image
+      run: |
+        docker push europe-central2-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/demo-app/demo-app
+
+    # 🚀 Deploy do Cloud Run
+    - name: Deploy to Cloud Run
+      run: |
+        gcloud run deploy demo-app \
+          --image europe-central2-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/demo-app/demo-app \
+          --region europe-central2 \
+          --platform managed \
+          --allow-unauthenticated
